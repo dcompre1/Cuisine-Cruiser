@@ -17,6 +17,7 @@ def print_recipe(meal):
     if yt != "":
         print("Here is a youtube tutorial for this recipe: " + yt)
 
+
 def has_restrictions(meal, restrictions):
     '''function to check that meal does not contain users restrictions'''
     i = 1
@@ -26,4 +27,3 @@ def has_restrictions(meal, restrictions):
         if ingredient in restrictions:
             return True
     return False
-

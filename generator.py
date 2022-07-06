@@ -6,12 +6,12 @@ from recipe_funcs import print_recipe, has_restrictions
 
 print("Welcome to the Random Recipe Generator!")
 
-#go = True
+# go = True
 while(True):
 
     # prompt user: input preferences or receive recipe?
     skip = input("\nTo begin, please indicate whether you would like to input preferences" +
-                 " like ingredients, cuisine type, etc. or receive a recipe now:" + 
+                 " like ingredients, cuisine type, etc. or receive a recipe now:" +
                  " \n(y) yes, receive now\n(n) no, I have preferences to enter\n")
     if skip == "y":
         # no restrictions
@@ -28,7 +28,7 @@ while(True):
                      "press (v) for Vegan\n" +
                      "press (t) for Vegetarian\n" +
                      "press any other key to continue: ")
-        # if not vegan or vegetarian, prompt for main ingredient
+    # if not vegan or vegetarian, prompt for main ingredient
     if diet != "v" and diet != "t":
         main_in = input("\nAre you craving a main ingredient that you would like" +
                             " to include in your dish? If yes, please enter the name, if not press (n):")
