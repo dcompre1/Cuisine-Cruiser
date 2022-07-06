@@ -15,6 +15,9 @@ while(True):
                  "cuisine type, etc. or receive a recipe now:" +
                  " \n(y) yes, receive now\n(n) no, I have" +
                  " preferences to enter\n")
+    if skip != "y" or skip != "n":
+       print("You must enter 'y' or 'n'.")
+       exit()
     if skip == "y":
         # no restrictions
         # make into a loop for input to prompt if they want a different recipe
@@ -32,10 +35,9 @@ while(True):
                  "press any other key to continue: ")
     # if not vegan or vegetarian, prompt for main ingredient
     if diet != "v" and diet != "t":
-        main_in = input("\nAre you craving a main ingredient" +
-                        " that you would like" +
-                        " to include in your dish? If yes, please" +
-                        " enter the name, if not press (n):")
+        main_in = input("\nWhat main ingredient" +
+                        " would you like" +
+                        " to include in your dish? ")
         main_in = main_in.replace(" ", "_")
         main_in = main_in.lower()
         # prompt for any restrictions
@@ -73,16 +75,20 @@ while(True):
     elif diet == "t":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegetarian")
-    elif main_in != "n":
-        response = requests.get("https://www.themealdb.com" +
-                                "/api/json/v1/1/filter.php?i=" + main_in)
+    if main_in != "":
+        response = requests.get("https://www.themealdb.com/api/json/v1/1/filter.php?i=" + main_in)
     else:
-        response = requests.get("https://www.themealdb.com" +
-                                "/api/json/v1/1/random.php")
+        print("You must enter a main ingredient.")
+        exit() # TODO change into loop later
 
     meal_data = response.json()["meals"]
     new_data = []
-    for i in range(len(meal_data)):
+    try:
+        meal_data_len = len(meal_data)
+    except TypeError:
+        print("There are no recipes with your main ingredient in the database.")
+        exit()
+    for i in range(meal_data_len):
         meal = meal_data[i]
         resp = requests.get("https://www.themealdb.com" +
                             "/api/json/v1/1/lookup.php?i=" + meal["idMeal"])
