@@ -82,7 +82,7 @@ while(True):
                     new_data.append(meal)'''
         new_data.append(meal)
 
-        #randomize meal choice
+        # randomize meal choice
     chosen_meal = random.choice(new_data)
     print_recipe(chosen_meal)
     while True:
