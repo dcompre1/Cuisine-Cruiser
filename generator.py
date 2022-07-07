@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import sqlalchemy as db
 import random
 from recipe_funcs import print_recipe, has_restrictions
 
@@ -15,9 +16,9 @@ while(True):
                  "cuisine type, etc. or receive a recipe now:" +
                  " \n(y) yes, receive now\n(n) no, I have" +
                  " preferences to enter\n")
-    if skip != "y" or skip != "n":
-       print("You must enter 'y' or 'n'.")
-       exit()
+    if skip != "y" and skip != "n":
+        print("You must enter 'y' or 'n'.")
+        exit()
     if skip == "y":
         # no restrictions
         # make into a loop for input to prompt if they want a different recipe
@@ -72,11 +73,26 @@ while(True):
     if diet == "v":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegan")
+        response_data_nested = response.json()
+        response_data_list = response_data_nested.get("meals")
+        df = pd.DataFrame(response_data_list)
+        engine = db.create_engine('sqlite:///Vegan.db')
+        df.to_sql('vegan_meals', con=engine, if_exists='replace', index=False)
     elif diet == "t":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegetarian")
+        response_data_nested = response.json()
+        response_data_list = response_data_nested.get("meals")
+        df = pd.DataFrame(response_data_list)
+        engine = db.create_engine('sqlite:///Vegetarian.db')
+        df.to_sql('vegetarian_meals', con=engine, if_exists='replace', index=False)
     if main_in != "":
         response = requests.get("https://www.themealdb.com/api/json/v1/1/filter.php?i=" + main_in)
+        response_data_nested = response.json()
+        response_data_list = response_data_nested.get("meals")
+        df = pd.DataFrame(response_data_list)
+        engine = db.create_engine('sqlite:///Ingredient.db')
+        df.to_sql('ingredient_meals', con=engine, if_exists='replace', index=False)
     else:
         print("You must enter a main ingredient.")
         exit() # TODO change into loop later
@@ -120,10 +136,3 @@ while(True):
         if decision == "q":
             exit()
             # go = False
-
-''' idea for database use: keep a database of meal ids inorder to keep
-    record of user's previously viewed recipes '''
-'''another database idea: every time a recipe is chosen it is
-   added to the database and so we keep a record of the most popular
-   dishes in certain areas, categories '''
-'''another idea: use database to make meal plan'''
