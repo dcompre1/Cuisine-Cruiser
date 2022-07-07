@@ -1,3 +1,5 @@
+import pandas as pd
+
 def print_recipe(meal):
     '''print meal and recipe details'''
     meal_name = meal['strMeal']
@@ -27,3 +29,13 @@ def has_restrictions(meal, restrictions):
         if ingredient in restrictions:
             return True
     return False
+
+def filter_meals(engine, restrictions):
+    query_results = engine.execute("SELECT idMeal FROM meals").fetchall()
+    # print(pd.DataFrame(query_result))
+    num_ids = engine.execute("SELECT COUNT(idMeal) FROM meals").fetchall()
+    print(num_ids)
+    # get ids
+    # for each id, make an api call so we can get ingredients
+    # if any ingredients overlap with those in restrictions, remove meal from database 
+    

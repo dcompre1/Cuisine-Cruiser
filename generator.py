@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import sqlalchemy as db
 import random
-from recipe_funcs import print_recipe, has_restrictions
+from recipe_funcs import print_recipe, has_restrictions, filter_meals
 
 
 print("Welcome to the Random Recipe Generator!")
@@ -42,14 +42,14 @@ while(True):
         main_in = main_in.replace(" ", "_")
         main_in = main_in.lower()
         # prompt for any restrictions
-        ''' restricts = input("\nDo you have any ingredients" +
+        restricts = input("\nDo you have any ingredients" +
                           "that you would like to exclude" +
                           " from potential meals?\n" +
                           "Please enter each ingredient with space" +
                           " inbetween, or type \"none\"" +
                           " if you have no restrictions: ")
         restricts = restricts.lower()
-        restrictions = restricts.split() '''
+        restrictions = restricts.split()
         # prompt for cuisine type
         '''yes = True
         while (yes):
@@ -77,7 +77,7 @@ while(True):
         response_data_list = response_data_nested.get("meals")
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Vegan.db')
-        df.to_sql('vegan_meals', con=engine, if_exists='replace', index=False)
+        df.to_sql('meals', con=engine, if_exists='replace', index=False)
     elif diet == "t":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegetarian")
@@ -85,14 +85,15 @@ while(True):
         response_data_list = response_data_nested.get("meals")
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Vegetarian.db')
-        df.to_sql('vegetarian_meals', con=engine, if_exists='replace', index=False)
+        df.to_sql('meals', con=engine, if_exists='replace', index=False)
     if main_in != "":
         response = requests.get("https://www.themealdb.com/api/json/v1/1/filter.php?i=" + main_in)
         response_data_nested = response.json()
         response_data_list = response_data_nested.get("meals")
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Ingredient.db')
-        df.to_sql('ingredient_meals', con=engine, if_exists='replace', index=False)
+        df.to_sql('meals', con=engine, if_exists='replace', index=False)
+        filter_meals(engine, restricts)
     else:
         print("You must enter a main ingredient.")
         exit() # TODO change into loop later
