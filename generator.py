@@ -7,13 +7,12 @@ from recipe_funcs import print_recipe, has_restrictions, filter_meals
 
 print("Welcome to the Random Recipe Generator!")
 
-# go = True
 while(True):
 
     # prompt user: input preferences or receive recipe?
     skip = input("\nTo begin, please indicate whether you would like" +
-                 " to input preferences like ingredients, " +
-                 "cuisine type, etc. or receive a recipe now:" +
+                 " to input preferences like ingredients to exclude and " +
+                 " cuisine type, or receive a recipe now:" +
                  " \n(y) yes, receive now\n(n) no, I have" +
                  " preferences to enter\n")
     if skip != "y" and skip != "n":
@@ -30,47 +29,38 @@ while(True):
 
     # yes restrictions
     # prompt user: vegan or vegetarian?
-    diet = input("\nIndicate if you are vegan or vegetarian:\n" +
+    restricts = input("\nDo you have any ingredients that you would like to exclude" +
+                 " from potential recipes?"
+                 " If you are vegan or vegetarian:\n" +
                  "press (v) for Vegan\n" +
                  "press (t) for Vegetarian\n" +
-                 "press any other key to continue: ")
-    # if not vegan or vegetarian, prompt for main ingredient
-    if diet != "v" and diet != "t":
-        main_in = input("\nWhat main ingredient" +
-                        " would you like" +
-                        " to include in your dish? ")
-        main_in = main_in.replace(" ", "_")
-        main_in = main_in.lower()
-        # prompt for any restrictions
-        restricts = input("\nDo you have any ingredients" +
-                          "that you would like to exclude" +
-                          " from potential meals?\n" +
-                          "Please enter each ingredient with space" +
-                          " inbetween, or type \"none\"" +
-                          " if you have no restrictions: ")
-        restricts = restricts.lower()
-        restrictions = restricts.split()
-        # prompt for cuisine type
-        '''yes = True
-        while (yes):
-            cuisine = input("\nFinally, please indicate a cuisine type,\n" +
+                 "Otherwise enter ingredient(s) with comma in between: \n")
+                 #+ "or type \"none\"")
+
+    r = restricts.lower()
+    restrictions = r.split(",")
+
+    # prompt for cuisine type
+    yes = True
+    while (yes):
+        cuisine = input("\nFinally, please indicate a cuisine type,\n" +
                             "to see a list of possible cuisine types" +
                             "press (y),\n to skip this step and" +
                             " receive a recipe result press (n):")
-            cuisine = cuisine.lower()
-            if cuisine == "y":
-                response = requests.get("https://www.themealdb.com" +
+        cuisine = cuisine.lower().capitalize()
+        if cuisine == "y":
+            response = requests.get("https://www.themealdb.com" +
                                         "/api/json/v1/1/list.php?a=list")
-                data = response.json()["meals"]
-                areas = []
-                for datum in data:
-                    areas.append(datum["strArea"])
+            data = response.json()["meals"]
+            areas = []
+            for datum in data:
+                areas.append(datum["strArea"])
                 print(areas)
-            else:
-                yes = False '''
+        else:
+            yes = False
 
         # API get recipes based on MI, if not, get based on vegan or vegetarian
-    if diet == "v":
+    if restricts == "v":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegan")
         response_data_nested = response.json()
@@ -78,7 +68,7 @@ while(True):
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Vegan.db')
         df.to_sql('meals', con=engine, if_exists='replace', index=False)
-    elif diet == "t":
+    elif restricts == "t":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegetarian")
         response_data_nested = response.json()
@@ -86,16 +76,16 @@ while(True):
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Vegetarian.db')
         df.to_sql('meals', con=engine, if_exists='replace', index=False)
-    if main_in != "":
-        response = requests.get("https://www.themealdb.com/api/json/v1/1/filter.php?i=" + main_in)
+    elif cuisine != "":
+        response = requests.get("https://www.themealdb.com/api/json/v1/1/filter.php?a=" + cuisine)
         response_data_nested = response.json()
         response_data_list = response_data_nested.get("meals")
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Ingredient.db')
         df.to_sql('meals', con=engine, if_exists='replace', index=False)
-        filter_meals(engine, restricts)
+        filter_meals(engine, restrictions)
     else:
-        print("You must enter a main ingredient.")
+        print("You must enter a cuisine type.")
         exit() # TODO change into loop later
 
     meal_data = response.json()["meals"]
@@ -137,3 +127,4 @@ while(True):
         if decision == "q":
             exit()
             # go = False
+
