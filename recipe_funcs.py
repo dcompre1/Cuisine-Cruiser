@@ -7,7 +7,7 @@ def print_recipe(meal):
     instructions = meal['strInstructions']
     yt = meal['strYoutube']
 
-    print("Here is your recipe: " + meal_name)
+    print("\nHere is your recipe: " + meal_name)
     # print(instructions)
 
     ingredient = meal['strIngredient1']
@@ -19,7 +19,7 @@ def print_recipe(meal):
         measure = meal['strMeasure' + str(i)]
         i += 1
     if yt != "":
-        print("Here is a youtube tutorial for this recipe: " + yt)
+        print("\nHere is a YouTube tutorial for your recipe: " + yt)
 
 
 def has_restrictions(meal, restrictions):
@@ -35,7 +35,13 @@ def has_restrictions(meal, restrictions):
         ingredient = meal['strIngredient' + str(j)]
     return False
 
-def filter_meals(engine, restrictions):
+def has_cuisine(meal, cuisine):
+    area = meal['strArea']
+    if area == cuisine:
+        return False
+    return True
+
+def filter_meals(engine, c, restrictions, cuisine):
     query_results = engine.execute("SELECT idMeal FROM meals").fetchall()
     num_ids = engine.execute("SELECT COUNT(idMeal) FROM meals").fetchall()[0][0]
     meals = []
@@ -43,14 +49,18 @@ def filter_meals(engine, restrictions):
         id = pd.DataFrame(query_results)[0][i]
         result = requests.get("https://www.themealdb.com/api/json/v1/1/lookup.php?i=" + id)
         meal = result.json()["meals"][0]
-        r = has_restrictions(meal, restrictions)
-        # has restrictions, so needs to be removed from database
+        if c == "v" or c == "t":
+            r = has_cuisine(meal, cuisine)
+            # filter out based on cuisine
+        else:
+            if restrictions[0] == "none":
+                r = False
+            else:
+                r = has_restrictions(meal, restrictions)
+            # has restrictions, so needs to be removed from database
         if r == True:
             engine.execute("DELETE FROM meals WHERE idMeal = " + id)
         else:
             meals.append(meal)
-    query_results = engine.execute("SELECT idMeal FROM meals").fetchall()
     return meals
-    # if any ingredients overlap with those in restrictions, remove meal from database
-    # save meal info of meals that don't have restrictions
 

@@ -34,9 +34,12 @@ while(True):
                  " If you are vegan or vegetarian:\n" +
                  "press (v) for Vegan\n" +
                  "press (t) for Vegetarian\n" +
-                 "Otherwise enter ingredient(s) with comma in between: \n")
-                 #+ "or type \"none\"")
+                 "Otherwise enter ingredient(s) with comma in between: \n"
+                 + "or type \"none\"")
 
+    if restricts == "":
+        print("You have to input something") # TODO: fix
+        exit()
     r = restricts.lower()
     restrictions = r.split(",")
 
@@ -44,11 +47,10 @@ while(True):
     yes = True
     while (yes):
         cuisine = input("\nFinally, please indicate a cuisine type,\n" +
-                            "to see a list of possible cuisine types" +
-                            "press (y),\n to skip this step and" +
-                            " receive a recipe result press (n):")
+                            "to see a list of possible cuisine types " +
+                            "press (c), or to receive a recipe result press any key:")
         cuisine = cuisine.lower().capitalize()
-        if cuisine == "y":
+        if cuisine == "c":
             response = requests.get("https://www.themealdb.com" +
                                         "/api/json/v1/1/list.php?a=list")
             data = response.json()["meals"]
@@ -68,6 +70,7 @@ while(True):
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Vegan.db')
         df.to_sql('meals', con=engine, if_exists='replace', index=False)
+        meal_data = filter_meals(engine, "v",restrictions, cuisine)
     elif restricts == "t":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegetarian")
@@ -76,6 +79,7 @@ while(True):
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Vegetarian.db')
         df.to_sql('meals', con=engine, if_exists='replace', index=False)
+        meal_data = filter_meals(engine, "t", restrictions, cuisine)
     elif cuisine != "":
         response = requests.get("https://www.themealdb.com/api/json/v1/1/filter.php?a=" + cuisine)
         response_data_nested = response.json()
@@ -83,34 +87,23 @@ while(True):
         df = pd.DataFrame(response_data_list)
         engine = db.create_engine('sqlite:///Ingredient.db')
         df.to_sql('meals', con=engine, if_exists='replace', index=False)
-        filter_meals(engine, restrictions)
+        meal_data = filter_meals(engine, "n", restrictions, cuisine)
     else:
         print("You must enter a cuisine type.")
         exit() # TODO change into loop later
 
-    meal_data = response.json()["meals"]
-    new_data = []
+   # meal_data = response.json()["meals"]
     try:
         meal_data_len = len(meal_data)
     except TypeError:
-        print("There are no recipes with your main ingredient in the database.")
+        print("There are no recipes with your preferences in the database.")
         exit()
-    for i in range(meal_data_len):
-        meal = meal_data[i]
-        resp = requests.get("https://www.themealdb.com" +
-                            "/api/json/v1/1/lookup.php?i=" + meal["idMeal"])
-        meal = resp.json()["meals"][0]
-        # get list of meals that meet the specifications
-        '''if has_restrictions(meal, restrictions) is False:
-                if cuisine != "n" and meal["strArea"].lower() == cuisine:
-                    new_data.append(meal)
-                if cuisine == "n":
-                    new_data.append(meal)'''
-        new_data.append(meal)
 
-        # randomize meal choice
-    chosen_meal = random.choice(new_data)
+    # randomize meal choice
+    chosen_meal = random.choice(meal_data)
     print_recipe(chosen_meal)
+    meal_data.remove(chosen_meal)
+
     while True:
         decision = input("\nIf you would like to view a different" +
                          " recipe press (y)," +
@@ -118,13 +111,16 @@ while(True):
                          " over again press (p),\n" +
                          "otherwise press (q) to quit\n")
         if decision == "y":
-            chosen_meal = random.choice(new_data)
-            print_recipe(chosen_meal)
+            if len(meal_data) == 0:
+                print("There are no other recipes with your preferences in the database")
+            else:
+                chosen_meal = random.choice(meal_data)
+                print_recipe(chosen_meal)
+                meal_data.remove(chosen_meal)
             # this will cause big loop to start over
         if decision == "p":
             break
             # this will cause big loop to end program
         if decision == "q":
             exit()
-            # go = False
 
