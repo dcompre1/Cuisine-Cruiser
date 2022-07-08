@@ -13,6 +13,7 @@ def print_recipe(meal):
     print("\nHere is your recipe: " + meal_name + "\n")
     print(instructions + "\n")
 
+    print("Ingredients:")
     ingredient = meal['strIngredient1']
     measure = meal['strMeasure1']
     i = 2
@@ -40,6 +41,7 @@ def has_restrictions(meal, restrictions):
 
 
 def no_cuisine(meal, cuisine):
+    '''function to check meal originates from the correct area'''
     area = meal['strArea']
     if area == cuisine:
         return False
@@ -47,6 +49,8 @@ def no_cuisine(meal, cuisine):
 
 
 def filter_meals(engine, c, restrictions, cuisine):
+    '''Query database and update based on restrictions or cuisine
+       returns list of possible meals'''
     query_results = engine.execute("SELECT idMeal FROM meals").fetchall()
     num_ids = engine.execute("SELECT COUNT(idMeal) FROM " +
                              "meals").fetchall()[0][0]
@@ -73,6 +77,7 @@ def filter_meals(engine, c, restrictions, cuisine):
 
 
 def end_program_loop(data):
+    '''prompt user to end the program once they've received a recipe'''
     while True:
         decision = input("\nIf you would like to view a different" +
                          " recipe, press (y)." +
@@ -94,6 +99,7 @@ def end_program_loop(data):
 
 
 def end_program_loop_2():
+    '''prompt user to end program when they've received random recipe'''
     while True:
         decision = input("\nIf you would like to view a different" +
                          " recipe, press (y)." +
@@ -112,6 +118,8 @@ def end_program_loop_2():
 
 
 def create_database(category, response):
+    '''create database storing all vegetarian, vegan,
+       or meals based on cuisine'''
     try:
         response_data_nested = response.json()
         response_data_list = response_data_nested.get("meals")

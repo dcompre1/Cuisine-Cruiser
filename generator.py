@@ -10,11 +10,10 @@ while True:
 
     # prompt user: input preferences or receive recipe?
     skip = input(r_strings.get_first_message())
-    if skip != "y" and skip != "n":
-        print("You must enter 'y' or 'n'.")
-        exit()
+    while skip != "y" and skip != "n":
+        skip = input("You must enter 'y' or 'n'.\n")
     if skip == "y":
-        # no restrictions
+        # recieve random recipe
         url = "https://www.themealdb.com/api/json/v1/1/random.php"
         response = requests.get(url)
         meal = response.json()['meals'][0]
@@ -25,13 +24,14 @@ while True:
         elif result == "p":
             continue
 
-    # yes restrictions
+    # input restrictions
     # prompt user: vegan or vegetarian?
     restricts = input(r_strings.get_restrictions_prompt())
     while restricts == "":
-        restricts = input("Please enter a list of ingredients or type \"none\":\n")
+        restricts = input("Please enter a list of ingredients" +
+                          " or type \"none\":\n")
     r = restricts.lower()
-    restrictions = r.split(",")
+    restrictions = r.split(", ")
 
     # prompt for cuisine type
     yes = True
@@ -53,7 +53,8 @@ while True:
         else:
             break
 
-        # API get recipes based on MI, if not, get based on vegan or vegetarian
+    # API get recipes based on cuisine, if not, get based on vegan/vegetarian
+    # create databases
     if restricts == "v":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegan")
@@ -76,6 +77,7 @@ while True:
             exit()
         meal_data = filter_meals(engine, "n", restrictions, cuisine)
 
+    # catch error if meal_data is empty
     try:
         meal_data_len = len(meal_data)
     except TypeError:
@@ -86,7 +88,8 @@ while True:
     chosen_meal = random.choice(meal_data)
     print_recipe(chosen_meal)
     meal_data.remove(chosen_meal)
-    # call to loop at end of program
+
+    # call loop to end program
     result = end_program_loop(meal_data)
     if result == "p":
         continue
