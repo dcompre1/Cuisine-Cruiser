@@ -13,5 +13,6 @@ The program also allows for the user to input preferences like their diet specif
 # How to Run:
 * python3 generator.py
 
+![check-style](https://github.com/dcompre1/SEO_Week_2/actions/workflows/style_checker.yaml/badge.svg)
 
-
+![unit-tests](https://github.com/dcompre1/SEO_Week_2/actions/workflows/tester.yaml/badge.svg)
