@@ -1,4 +1,4 @@
-import pandas as pd
+import pandaxs as pd
 import requests
 import random
 import sqlalchemy as db
@@ -60,15 +60,14 @@ def filter_meals(engine, c, restrictions, cuisine):
         result = requests.get("https://www.themealdb.com" +
                               "/api/json/v1/1/lookup.php?i=" + id)
         meal = result.json()["meals"][0]
+        # filter out based on cuisine
         if c == "v" or c == "t":
             r = no_cuisine(meal, cuisine)
-            # filter out based on cuisine
-        else:
+        else:  # filter out based on restrictions
             if restrictions[0] == "none":
                 r = False
             else:
                 r = has_restrictions(meal, restrictions)
-            # has restrictions, so needs to be removed from database
         if r is True:
             engine.execute("DELETE FROM meals WHERE idMeal = " + id)
         else:

@@ -6,8 +6,8 @@ from recipe_strings import RecipeStrings
 
 print("Welcome to the Cuisine Cruiser!")
 r_strings = RecipeStrings()
-while True:
 
+while True:
     # prompt user: input preferences or receive recipe?
     skip = input(r_strings.get_first_message())
     while skip != "y" and skip != "n":
