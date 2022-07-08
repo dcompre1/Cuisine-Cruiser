@@ -1,5 +1,7 @@
 import pandas as pd
 import requests
+import random
+import sqlalchemy as db
 
 def print_recipe(meal):
     '''print meal and recipe details'''
@@ -7,19 +9,19 @@ def print_recipe(meal):
     instructions = meal['strInstructions']
     yt = meal['strYoutube']
 
-    print("\nHere is your recipe: " + meal_name)
-    # print(instructions)
+    print("\nHere is your recipe: " + meal_name + "\n")
+    print(instructions + "\n")
 
     ingredient = meal['strIngredient1']
     measure = meal['strMeasure1']
     i = 2
-    while ingredient is not None and ingredient != "":
+    while ingredient is not None and ingredient != "" and i < 21:
         print(measure + " " + ingredient)
         ingredient = meal['strIngredient' + str(i)]
         measure = meal['strMeasure' + str(i)]
         i += 1
     if yt != "":
-        print("\nHere is a YouTube tutorial for your recipe: " + yt)
+        print("\nHere is a YouTube tutorial for your recipe: " + yt + "\n")
 
 
 def has_restrictions(meal, restrictions):
@@ -64,3 +66,51 @@ def filter_meals(engine, c, restrictions, cuisine):
             meals.append(meal)
     return meals
 
+
+def end_program_loop(data):
+    while True:
+        decision = input("\nIf you would like to view a different" +
+                         " recipe press (y)," +
+                         "\nif you would like to begin the search" +
+                         " over again press (p),\n" +
+                         "otherwise press (q) to quit\n")
+        if decision == "y":
+            if len(data) == 0:
+                print("There are no other recipes with your preferences in the database")
+            else:
+                chosen_meal = random.choice(data)
+                print_recipe(chosen_meal)
+                data.remove(chosen_meal)
+        elif decision == "p":
+            return "p"
+        elif decision == "q":
+            return "q"
+
+def end_program_loop_2():
+    while True:
+        decision = input("\nIf you would like to view a different" +
+                         " recipe press (y)," +
+                         "\nif you would like to begin the search" +
+                         " over again press (p),\n" +
+                         "otherwise press (q) to quit\n")
+        if decision == "y":
+            url = "https://www.themealdb.com/api/json/v1/1/random.php"
+            response = requests.get(url)
+            meal = response.json()['meals'][0]
+            print_recipe(meal)
+        elif decision == "p":
+            return "p"
+        elif decision == "q":
+            return "q"
+
+def create_database(category, response):
+    try:
+       response_data_nested = response.json()
+       response_data_list = response_data_nested.get("meals")
+       df = pd.DataFrame(response_data_list)
+       engine = db.create_engine("sqlite:///" + category + ".db")
+       df.to_sql('meals', con=engine, if_exists='replace', index=False)
+       return engine
+    except Exception as e:
+       print("You entered invalid input")
+       return "q"
