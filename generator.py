@@ -4,9 +4,9 @@ from recipe_funcs import print_recipe, has_restrictions, filter_meals, \
                          end_program_loop, end_program_loop_2, create_database
 from recipe_strings import RecipeStrings
 
-print("Welcome to the Random Recipe Generator!")
+print("Welcome to the Cuisine Cruiser!")
 r_strings = RecipeStrings()
-while(True):
+while True:
 
     # prompt user: input preferences or receive recipe?
     skip = input(r_strings.get_first_message())
@@ -28,29 +28,30 @@ while(True):
     # yes restrictions
     # prompt user: vegan or vegetarian?
     restricts = input(r_strings.get_restrictions_prompt())
-    if restricts == "":
-        print("Please enter a list of ingredients or type \"none\"")
-        exit()
+    while restricts == "":
+        restricts = input("Please enter a list of ingredients or type \"none\":\n")
     r = restricts.lower()
     restrictions = r.split(",")
 
     # prompt for cuisine type
     yes = True
-    while (yes):
-        cuisine = input(r_strings.get_cuisine_prompt())
+    cuisine = input(r_strings.get_cuisine_prompt())
+    while True:
         cuisine = cuisine.lower().capitalize()
         if cuisine == "C":
             response = requests.get("https://www.themealdb.com" +
                                     "/api/json/v1/1/list.php?a=list")
             data = response.json()["meals"]
             areas = []
+            print("")
             for datum in data:
                 print(datum["strArea"])
+            cuisine = input(r_strings.get_cuisine_prompt())
         elif cuisine == "":
             while cuisine == "":
-                cuisine = input("Please enter a cuisine type:")
+                cuisine = input("Please enter a cuisine type:\n")
         else:
-            yes = False
+            break
 
         # API get recipes based on MI, if not, get based on vegan or vegetarian
     if restricts == "v":
