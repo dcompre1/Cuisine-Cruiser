@@ -1,8 +1,8 @@
 # Cuisine Cruiser
 
-Cuisine Cruiser is a recipe generator made for hungry users looking to try something new. 
-The generator uses TheMealDB API to provide a list of ingredients, instructions, and a youtube tutorial if available to help the user prepare their dish. 
-The program also allows for the user to input preferences like their diet specifications or location to find a recipe that better fits their tastes. 
+Cuisine Cruiser is a random recipe generator made for hungry users who are unsure of what they want to eat. 
+The generator uses [TheMealDB API](https://www.themealdb.com/api.php) to provide a list of ingredients, instructions, and a YouTube tutorial (if available) to help the user prepare their recipe. 
+It also allows the user to input preferences like ingredient(s) to avoid and desired cuisine type. 
 
 # Install These Libraries:
 * pandas
