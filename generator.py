@@ -80,12 +80,16 @@ while True:
     # catch error if meal_data is empty
     try:
         meal_data_len = len(meal_data)
-    except TypeError:
+    except Exception as e:
         print("There are no recipes with your preferences in the database.")
         exit()
 
     # randomize meal choice
-    chosen_meal = random.choice(meal_data)
+    try:
+        chosen_meal = random.choice(meal_data)
+    except IndexError:
+        print("There are no recipes with your preferences in the database.")
+        exit()
     print_recipe(chosen_meal)
     meal_data.remove(chosen_meal)
 

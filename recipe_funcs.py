@@ -1,4 +1,4 @@
-import pandaxs as pd
+import pandas as pd
 import requests
 import random
 import sqlalchemy as db
