@@ -28,7 +28,7 @@ def has_restrictions(meal, restrictions):
     '''function to check that meal does not contain users restrictions'''
     ingredient = meal['strIngredient1']
     j = 2
-    while ingredient is not None and ingredient != "":
+    while ingredient is not None and ingredient != "" and j < 21:
         ingredient = ingredient.lower()
         for i in range(len(restrictions)):
             if restrictions[i] in ingredient:
@@ -37,7 +37,7 @@ def has_restrictions(meal, restrictions):
         ingredient = meal['strIngredient' + str(j)]
     return False
 
-def has_cuisine(meal, cuisine):
+def no_cuisine(meal, cuisine):
     area = meal['strArea']
     if area == cuisine:
         return False
@@ -52,7 +52,7 @@ def filter_meals(engine, c, restrictions, cuisine):
         result = requests.get("https://www.themealdb.com/api/json/v1/1/lookup.php?i=" + id)
         meal = result.json()["meals"][0]
         if c == "v" or c == "t":
-            r = has_cuisine(meal, cuisine)
+            r = no_cuisine(meal, cuisine)
             # filter out based on cuisine
         else:
             if restrictions[0] == "none":
