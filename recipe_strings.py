@@ -8,17 +8,17 @@ class RecipeStrings:
                " to input preferences like ingredients to exclude and" + \
                " cuisine type, or receive a recipe now:" + \
                " \n(y) yes, receive now\n(n) no, I have" + \
-               " preferences to enter\n"
+               " preferences to enter:\n"
 
     def get_restrictions_prompt(self):
-        return "\nDo you have any ingredients that you would like to exclude from" + \
-                 " from potential recipes?" + \
-                 " If you are vegan or vegetarian:\n" + \
+        return "\nDo you have any ingredients that you " + \
+                 "would like to exclude from potential recipes?\n" + \
+                 "If you are vegan or vegetarian:\n" + \
                  "press (v) for Vegan\n" + \
                  "press (t) for Vegetarian\n" + \
-                 "Otherwise enter ingredient(s) with comma in between:" + \
-                 "or type \"none\":\n"
+                 "Otherwise, enter ingredient(s) with commas " + \
+                 "in between each, or type \"none\":\n"
 
     def get_cuisine_prompt(self):
-        return "\nFinally, please indicate a cuisine type,\n" + \
-               "or press (c) to see a list of possible cuisine types\n"
+        return "\nLastly, please indicate a cuisine type,\n" + \
+               "or press (c) to see a list of possible cuisine types:\n"

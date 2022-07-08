@@ -29,7 +29,7 @@ while(True):
     # prompt user: vegan or vegetarian?
     restricts = input(r_strings.get_restrictions_prompt())
     if restricts == "":
-        print("Please enter a list of ingredients or type \"none\"") # TODO: fix
+        print("Please enter a list of ingredients or type \"none\"")
         exit()
     r = restricts.lower()
     restrictions = r.split(",")
@@ -41,7 +41,7 @@ while(True):
         cuisine = cuisine.lower().capitalize()
         if cuisine == "C":
             response = requests.get("https://www.themealdb.com" +
-                                        "/api/json/v1/1/list.php?a=list")
+                                    "/api/json/v1/1/list.php?a=list")
             data = response.json()["meals"]
             areas = []
             for datum in data:
@@ -59,7 +59,7 @@ while(True):
         engine = create_database("Vegan", response)
         if engine == "q":
             exit()
-        meal_data = filter_meals(engine, "v",restrictions, cuisine)
+        meal_data = filter_meals(engine, "v", restrictions, cuisine)
     elif restricts == "t":
         response = requests.get("https://www.themealdb.com" +
                                 "/api/json/v1/1/filter.php?c=Vegetarian")
@@ -68,7 +68,8 @@ while(True):
             exit()
         meal_data = filter_meals(engine, "t", restrictions, cuisine)
     elif cuisine != "":
-        response = requests.get("https://www.themealdb.com/api/json/v1/1/filter.php?a=" + cuisine)
+        response = requests.get("https://www.themealdb.com" +
+                                "/api/json/v1/1/filter.php?a=" + cuisine)
         engine = create_database("Cuisine", response)
         if engine == "q":
             exit()

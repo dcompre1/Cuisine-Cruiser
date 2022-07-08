@@ -3,6 +3,7 @@ import requests
 import random
 import sqlalchemy as db
 
+
 def print_recipe(meal):
     '''print meal and recipe details'''
     meal_name = meal['strMeal']
@@ -37,19 +38,23 @@ def has_restrictions(meal, restrictions):
         ingredient = meal['strIngredient' + str(j)]
     return False
 
+
 def no_cuisine(meal, cuisine):
     area = meal['strArea']
     if area == cuisine:
         return False
     return True
 
+
 def filter_meals(engine, c, restrictions, cuisine):
     query_results = engine.execute("SELECT idMeal FROM meals").fetchall()
-    num_ids = engine.execute("SELECT COUNT(idMeal) FROM meals").fetchall()[0][0]
+    num_ids = engine.execute("SELECT COUNT(idMeal) FROM " +
+                             "meals").fetchall()[0][0]
     meals = []
     for i in range(num_ids):
         id = pd.DataFrame(query_results)[0][i]
-        result = requests.get("https://www.themealdb.com/api/json/v1/1/lookup.php?i=" + id)
+        result = requests.get("https://www.themealdb.com" +
+                              "/api/json/v1/1/lookup.php?i=" + id)
         meal = result.json()["meals"][0]
         if c == "v" or c == "t":
             r = no_cuisine(meal, cuisine)
@@ -60,7 +65,7 @@ def filter_meals(engine, c, restrictions, cuisine):
             else:
                 r = has_restrictions(meal, restrictions)
             # has restrictions, so needs to be removed from database
-        if r == True:
+        if r is True:
             engine.execute("DELETE FROM meals WHERE idMeal = " + id)
         else:
             meals.append(meal)
@@ -76,7 +81,8 @@ def end_program_loop(data):
                          "otherwise press (q) to quit\n")
         if decision == "y":
             if len(data) == 0:
-                print("There are no other recipes with your preferences in the database")
+                print("There are no other recipes " +
+                      "with your preferences in the database")
             else:
                 chosen_meal = random.choice(data)
                 print_recipe(chosen_meal)
@@ -85,6 +91,7 @@ def end_program_loop(data):
             return "p"
         elif decision == "q":
             return "q"
+
 
 def end_program_loop_2():
     while True:
@@ -103,14 +110,15 @@ def end_program_loop_2():
         elif decision == "q":
             return "q"
 
+
 def create_database(category, response):
     try:
-       response_data_nested = response.json()
-       response_data_list = response_data_nested.get("meals")
-       df = pd.DataFrame(response_data_list)
-       engine = db.create_engine("sqlite:///" + category + ".db")
-       df.to_sql('meals', con=engine, if_exists='replace', index=False)
-       return engine
+        response_data_nested = response.json()
+        response_data_list = response_data_nested.get("meals")
+        df = pd.DataFrame(response_data_list)
+        engine = db.create_engine("sqlite:///" + category + ".db")
+        df.to_sql('meals', con=engine, if_exists='replace', index=False)
+        return engine
     except Exception as e:
-       print("You entered invalid input")
-       return "q"
+        print("You entered invalid input")
+        return "q"
