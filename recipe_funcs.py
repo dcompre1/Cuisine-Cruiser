@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import random
 import sqlalchemy as db
+from recipe_strings import get_loop_message
 
 
 def print_recipe(meal):
@@ -24,6 +25,17 @@ def print_recipe(meal):
         i += 1
     if yt != "":
         print("\nHere is a YouTube tutorial for your recipe: " + yt)
+
+
+def print_cuisines():
+    '''print all cuisine types to user'''
+    response = requests.get("https://www.themealdb.com" +
+                            "/api/json/v1/1/list.php?a=list")
+    data = response.json()["meals"]
+    areas = []
+    print("")
+    for datum in data:
+        print(datum["strArea"])
 
 
 def has_restrictions(meal, restrictions):
@@ -78,11 +90,7 @@ def filter_meals(engine, c, restrictions, cuisine):
 def end_program_loop(data):
     '''prompt user to end the program once they've received a recipe'''
     while True:
-        decision = input("\nIf you would like to view a different" +
-                         " recipe, press (y)." +
-                         "\nIf you would like to begin the search" +
-                         " over again, press (p).\n" +
-                         "Otherwise, press (q) to quit:\n")
+        decision = input(get_loop_message())
         if decision == "y":
             if len(data) == 0:
                 print("There are no other recipes " +
@@ -100,11 +108,7 @@ def end_program_loop(data):
 def end_program_loop_2():
     '''prompt user to end program when they've received random recipe'''
     while True:
-        decision = input("\nIf you would like to view a different" +
-                         " recipe, press (y)." +
-                         "\nIf you would like to begin the search" +
-                         " over again, press (p).\n" +
-                         "Otherwise, press (q) to quit:\n")
+        decision = input(get_loop_message())
         if decision == "y":
             url = "https://www.themealdb.com/api/json/v1/1/random.php"
             response = requests.get(url)
@@ -117,8 +121,8 @@ def end_program_loop_2():
 
 
 def create_database(category, response):
-    '''create database storing all vegetarian, vegan,
-       or meals based on cuisine'''
+    '''create database storing all vegetarian meals, vegan meals, or
+       based on cuisine'''
     try:
         response_data_nested = response.json()
         response_data_list = response_data_nested.get("meals")

@@ -1,15 +1,16 @@
 import requests
 import random
 from recipe_funcs import print_recipe, has_restrictions, filter_meals, \
-                         end_program_loop, end_program_loop_2, create_database
-from recipe_strings import RecipeStrings
+                         end_program_loop, end_program_loop_2, \
+                         create_database, print_cuisines
+from recipe_strings import get_first_message, get_restrictions_prompt, \
+                           get_cuisine_prompt
 
 print("Welcome to the Cuisine Cruiser!")
-r_strings = RecipeStrings()
 
 while True:
     # prompt user: input preferences or receive recipe?
-    skip = input(r_strings.get_first_message())
+    skip = input(get_first_message())
     while skip != "y" and skip != "n":
         skip = input("You must enter 'y' or 'n'.\n")
     if skip == "y":
@@ -26,7 +27,7 @@ while True:
 
     # input restrictions
     # prompt user: vegan or vegetarian?
-    restricts = input(r_strings.get_restrictions_prompt())
+    restricts = input(get_restrictions_prompt())
     while restricts == "":
         restricts = input("Please enter a list of ingredients" +
                           " or type \"none\":\n")
@@ -34,19 +35,12 @@ while True:
     restrictions = r.split(", ")
 
     # prompt for cuisine type
-    yes = True
-    cuisine = input(r_strings.get_cuisine_prompt())
+    cuisine = input(get_cuisine_prompt())
     while True:
         cuisine = cuisine.lower().capitalize()
         if cuisine == "C":
-            response = requests.get("https://www.themealdb.com" +
-                                    "/api/json/v1/1/list.php?a=list")
-            data = response.json()["meals"]
-            areas = []
-            print("")
-            for datum in data:
-                print(datum["strArea"])
-            cuisine = input(r_strings.get_cuisine_prompt())
+            print_cuisines()
+            cuisine = input(get_cuisine_prompt())
         elif cuisine == "":
             while cuisine == "":
                 cuisine = input("Please enter a cuisine type:\n")
@@ -77,14 +71,7 @@ while True:
             exit()
         meal_data = filter_meals(engine, "n", restrictions, cuisine)
 
-    # catch error if meal_data is empty
-    try:
-        meal_data_len = len(meal_data)
-    except Exception as e:
-        print("There are no recipes with your preferences in the database.")
-        exit()
-
-    # randomize meal choice
+    # randomize meal choice, catch error if meal_data is empty
     try:
         chosen_meal = random.choice(meal_data)
     except IndexError:
